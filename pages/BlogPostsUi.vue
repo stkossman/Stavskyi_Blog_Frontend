@@ -43,11 +43,27 @@
   </div>
 </template>
 
+<style>
+.active-link {
+  color: #3b82f6;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.active-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #2563eb;
+}
+</style>
+
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getPaginationRowModel } from '@tanstack/vue-table'
 import type { TableColumn } from '@nuxt/ui'
+import { useRouter } from 'vue-router'
 
 const table = ref()
 
@@ -57,6 +73,7 @@ type Post = {
   category: string
   title: string
   date: string
+  slug: string
 }
 
 const posts = ref<Post[]>([])
@@ -74,7 +91,8 @@ const getPosts = async () => {
         name: post.user?.name || '',
         category: post.category?.title || '',
         title: post.title,
-        date: post.published_at
+        date: post.published_at,
+        slug: post.slug,
       })) as Post[]
 
       allPosts = allPosts.concat(pagePosts)
@@ -88,8 +106,9 @@ const getPosts = async () => {
   }
 }
 
-
 getPosts()
+
+const router = useRouter()
 
 const columns: TableColumn<Post>[] = [
   {
@@ -120,7 +139,19 @@ const columns: TableColumn<Post>[] = [
   },
   {
     accessorKey: 'title',
-    header: 'Title'
+    header: 'Title',
+    cell: ({row}) => {
+      const slug = row.original.slug
+      const title = row.getValue('title')
+      return h('a', {
+        href: `/blog/${slug}`,
+        class: 'active-link',
+        onClick: (e: Event) => {
+          e.preventDefault()
+          router.push(`/blog/${slug}`)
+        }
+      }, title)
+    },
   }
 ]
 
@@ -230,6 +261,7 @@ const pagination = ref({
   color: #3b82f6;
   font-weight: 500;
   text-decoration: none;
+  transition: all 0.2s ease;
 }
 
 .inactive-link {
@@ -240,6 +272,8 @@ const pagination = ref({
 .active-link:hover,
 .inactive-link:hover {
   text-decoration: underline;
+  cursor: pointer;
+  color: #2563eb;
 }
 
 .footer-pagination {
@@ -323,33 +357,5 @@ const pagination = ref({
 .footer-pagination :deep(.upagination button:first-child),
 .footer-pagination :deep(.upagination button:last-child) {
   font-weight: 600;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .footer-pagination {
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem 1rem;
-  }
-
-  .pagination-control {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .pagination-label {
-    text-align: center;
-  }
-}
-
-@media (max-width: 480px) {
-  .footer-pagination :deep(.upagination button) {
-    padding: 0.375rem 0.5rem;
-    min-width: 2rem;
-    height: 2rem;
-    font-size: 0.8125rem;
-  }
 }
 </style>
