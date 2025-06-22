@@ -10,11 +10,17 @@ export default defineNuxtConfig({
     ]
   },
 
+  icon: {
+    mode: 'css',
+    cssLayer: 'base',
+  },
+
   modules: [
     '@nuxt/ui',
     '@nuxtjs/tailwindcss',
     'nuxt-zod-i18n',
-    '@nuxtjs/i18n'
+    '@nuxtjs/i18n',
+    '@nuxt/icon',
   ],
 
   runtimeConfig: {

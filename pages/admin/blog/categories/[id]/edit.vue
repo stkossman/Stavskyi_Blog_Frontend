@@ -161,7 +161,6 @@ const isSubmitting = ref(false);
 const isLoadingCategories = ref(false);
 const availableCategories = ref<Category[]>([]);
 
-// Завантаження даних категорії
 const { data: categoryData, pending, error, refresh } = await useAsyncData(
     `category-${categoryId}`,
     async () => {
@@ -184,7 +183,6 @@ const { data: categoryData, pending, error, refresh } = await useAsyncData(
     }
 );
 
-// Завантаження списку категорій для селекта
 const fetchCategoriesForSelect = async () => {
   isLoadingCategories.value = true;
   try {
@@ -193,7 +191,6 @@ const fetchCategoriesForSelect = async () => {
     console.log("Raw API response (edit):", response);
 
     if (response && response.data && Array.isArray(response.data)) {
-      // Фільтруємо поточну категорію щоб не дозволити вибрати саму себе як батьківську
       availableCategories.value = response.data.filter(cat => cat.id !== categoryId);
       console.log("Available categories for edit:", availableCategories.value);
       console.log("Categories count (edit):", availableCategories.value.length);
@@ -215,7 +212,6 @@ const fetchCategoriesForSelect = async () => {
   }
 };
 
-// Ініціалізація форми при завантаженні даних
 watch(categoryData, (newData) => {
   if (newData) {
     state.value = {
@@ -286,7 +282,6 @@ const onSubmit = async () => {
   }
 };
 
-// Завантажуємо категорії після монтування компонента
 onMounted(() => {
   fetchCategoriesForSelect();
 });
